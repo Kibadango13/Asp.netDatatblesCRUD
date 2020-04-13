@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="DBPruebaModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="CUIDAD">
+    <Key>
+      <PropertyRef Name="IIDCUIDAD" />
+    </Key>
+    <Property Name="IIDCUIDAD" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="NOMBRE" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Personas" Relationship="Self.FK_Persona_CUIDAD" FromRole="CUIDAD" ToRole="Persona" />
+  </EntityType>
+  <EntityType Name="DETALLE">
+    <Key>
+      <PropertyRef Name="IIDDETALLE" />
+    </Key>
+    <Property Name="IIDDETALLE" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IIDFACTURA" Type="Int32" Nullable="false" />
+    <Property Name="NOMBREPRODUCTO" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="CANTIDAD" Type="Decimal" Precision="18" Scale="0" />
+    <Property Name="PRECIO_UNITARIO" Type="Decimal" Precision="19" Scale="4" />
+    <Property Name="TOTAL" Type="Decimal" Precision="19" Scale="4" />
+    <Property Name="ESTADO" Type="Int32" />
+    <NavigationProperty Name="FACTURA" Relationship="Self.FK_DETALLE_FACTURA" FromRole="DETALLE" ToRole="FACTURA" />
+  </EntityType>
+  <EntityType Name="FACTURA">
+    <Key>
+      <PropertyRef Name="IIDFACTURA" />
+    </Key>
+    <Property Name="IIDFACTURA" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IIDPERSONA" Type="Int32" />
+    <Property Name="NUMFACTURA" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="CEDULA" Type="String" MaxLength="13" FixedLength="false" Unicode="false" />
+    <Property Name="FECHA" Type="DateTime" Precision="3" />
+    <Property Name="IVA" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="ESTADO" Type="Int32" />
+    <NavigationProperty Name="DETALLEs" Relationship="Self.FK_DETALLE_FACTURA" FromRole="FACTURA" ToRole="DETALLE" />
+    <NavigationProperty Name="Persona" Relationship="Self.FK_FACTURA_Persona" FromRole="FACTURA" ToRole="Persona" />
+  </EntityType>
+  <EntityType Name="Persona">
+    <Key>
+      <PropertyRef Name="IIDPersona" />
+    </Key>
+    <Property Name="IIDPersona" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IIDCUIDAD" Type="Int32" />
+    <Property Name="CEDULA" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="NOMBRE" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="APELLIDO" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="TELEFONO" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="ESTADO" Type="Int32" />
+    <NavigationProperty Name="CUIDAD" Relationship="Self.FK_Persona_CUIDAD" FromRole="Persona" ToRole="CUIDAD" />
+    <NavigationProperty Name="FACTURAs" Relationship="Self.FK_FACTURA_Persona" FromRole="Persona" ToRole="FACTURA" />
+  </EntityType>
+  <Association Name="FK_Persona_CUIDAD">
+    <End Role="CUIDAD" Type="Self.CUIDAD" Multiplicity="0..1" />
+    <End Role="Persona" Type="Self.Persona" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="CUIDAD">
+        <PropertyRef Name="IIDCUIDAD" />
+      </Principal>
+      <Dependent Role="Persona">
+        <PropertyRef Name="IIDCUIDAD" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_DETALLE_FACTURA">
+    <End Role="FACTURA" Type="Self.FACTURA" Multiplicity="1" />
+    <End Role="DETALLE" Type="Self.DETALLE" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="FACTURA">
+        <PropertyRef Name="IIDFACTURA" />
+      </Principal>
+      <Dependent Role="DETALLE">
+        <PropertyRef Name="IIDFACTURA" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_FACTURA_Persona">
+    <End Role="Persona" Type="Self.Persona" Multiplicity="0..1" />
+    <End Role="FACTURA" Type="Self.FACTURA" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Persona">
+        <PropertyRef Name="IIDPersona" />
+      </Principal>
+      <Dependent Role="FACTURA">
+        <PropertyRef Name="IIDPERSONA" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="DBPruebaEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="CUIDADs" EntityType="Self.CUIDAD" />
+    <EntitySet Name="DETALLEs" EntityType="Self.DETALLE" />
+    <EntitySet Name="FACTURAs" EntityType="Self.FACTURA" />
+    <EntitySet Name="Personas" EntityType="Self.Persona" />
+    <AssociationSet Name="FK_Persona_CUIDAD" Association="Self.FK_Persona_CUIDAD">
+      <End Role="CUIDAD" EntitySet="CUIDADs" />
+      <End Role="Persona" EntitySet="Personas" />
+    </AssociationSet>
+    <AssociationSet Name="FK_DETALLE_FACTURA" Association="Self.FK_DETALLE_FACTURA">
+      <End Role="FACTURA" EntitySet="FACTURAs" />
+      <End Role="DETALLE" EntitySet="DETALLEs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_FACTURA_Persona" Association="Self.FK_FACTURA_Persona">
+      <End Role="Persona" EntitySet="Personas" />
+      <End Role="FACTURA" EntitySet="FACTURAs" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

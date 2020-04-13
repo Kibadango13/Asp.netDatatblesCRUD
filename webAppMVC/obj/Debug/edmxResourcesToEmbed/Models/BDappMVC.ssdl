@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="DBPruebaModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="CUIDAD">
+    <Key>
+      <PropertyRef Name="IIDCUIDAD" />
+    </Key>
+    <Property Name="IIDCUIDAD" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="NOMBRE" Type="varchar" MaxLength="15" />
+  </EntityType>
+  <EntityType Name="DETALLE">
+    <Key>
+      <PropertyRef Name="IIDDETALLE" />
+    </Key>
+    <Property Name="IIDDETALLE" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IIDFACTURA" Type="int" Nullable="false" />
+    <Property Name="NOMBREPRODUCTO" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="CANTIDAD" Type="decimal" Precision="18" Scale="0" />
+    <Property Name="PRECIO_UNITARIO" Type="money" />
+    <Property Name="TOTAL" Type="money" />
+    <Property Name="ESTADO" Type="int" />
+  </EntityType>
+  <EntityType Name="FACTURA">
+    <Key>
+      <PropertyRef Name="IIDFACTURA" />
+    </Key>
+    <Property Name="IIDFACTURA" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IIDPERSONA" Type="int" />
+    <Property Name="NUMFACTURA" Type="varchar" MaxLength="150" />
+    <Property Name="CEDULA" Type="varchar" MaxLength="13" />
+    <Property Name="FECHA" Type="datetime" />
+    <Property Name="IVA" Type="varchar" MaxLength="15" />
+    <Property Name="ESTADO" Type="int" />
+  </EntityType>
+  <EntityType Name="Persona">
+    <Key>
+      <PropertyRef Name="IIDPersona" />
+    </Key>
+    <Property Name="IIDPersona" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IIDCUIDAD" Type="int" />
+    <Property Name="CEDULA" Type="varchar" MaxLength="100" />
+    <Property Name="NOMBRE" Type="varchar" MaxLength="100" />
+    <Property Name="APELLIDO" Type="varchar" MaxLength="150" />
+    <Property Name="TELEFONO" Type="varchar" MaxLength="15" />
+    <Property Name="ESTADO" Type="int" />
+  </EntityType>
+  <Association Name="FK_DETALLE_FACTURA">
+    <End Role="FACTURA" Type="Self.FACTURA" Multiplicity="1" />
+    <End Role="DETALLE" Type="Self.DETALLE" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="FACTURA">
+        <PropertyRef Name="IIDFACTURA" />
+      </Principal>
+      <Dependent Role="DETALLE">
+        <PropertyRef Name="IIDFACTURA" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_FACTURA_Persona">
+    <End Role="Persona" Type="Self.Persona" Multiplicity="0..1" />
+    <End Role="FACTURA" Type="Self.FACTURA" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Persona">
+        <PropertyRef Name="IIDPersona" />
+      </Principal>
+      <Dependent Role="FACTURA">
+        <PropertyRef Name="IIDPERSONA" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Persona_CUIDAD">
+    <End Role="CUIDAD" Type="Self.CUIDAD" Multiplicity="0..1" />
+    <End Role="Persona" Type="Self.Persona" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="CUIDAD">
+        <PropertyRef Name="IIDCUIDAD" />
+      </Principal>
+      <Dependent Role="Persona">
+        <PropertyRef Name="IIDCUIDAD" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="DBPruebaModelStoreContainer">
+    <EntitySet Name="CUIDAD" EntityType="Self.CUIDAD" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="DETALLE" EntityType="Self.DETALLE" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="FACTURA" EntityType="Self.FACTURA" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Persona" EntityType="Self.Persona" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_DETALLE_FACTURA" Association="Self.FK_DETALLE_FACTURA">
+      <End Role="FACTURA" EntitySet="FACTURA" />
+      <End Role="DETALLE" EntitySet="DETALLE" />
+    </AssociationSet>
+    <AssociationSet Name="FK_FACTURA_Persona" Association="Self.FK_FACTURA_Persona">
+      <End Role="Persona" EntitySet="Persona" />
+      <End Role="FACTURA" EntitySet="FACTURA" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Persona_CUIDAD" Association="Self.FK_Persona_CUIDAD">
+      <End Role="CUIDAD" EntitySet="CUIDAD" />
+      <End Role="Persona" EntitySet="Persona" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

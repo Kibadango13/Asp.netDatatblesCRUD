@@ -1,0 +1,553 @@
+﻿@using webAppMVC.Models;
+@model FacturaCLS
+
+@{
+    ViewBag.Title = "Index";
+    List<SelectListItem> listaCliente = (List<SelectListItem>)ViewBag.lista;
+}
+
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Factura</div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+
+                        <div class="col-xs-12 text-center"><h2>FACTURA</h2></div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IIDPERSONA, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("IIDPERSONA", listaCliente, null, new { @class = "form-control Cliente_cb" })
+                                @Html.ValidationMessage("NOMBRE", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FECHA, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.FECHA, new { htmlAttributes = new { @class = "form-control  FechaFactura" } })
+                                @Html.ValidationMessageFor(model => model.FECHA, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NUMFACTURA, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.NUMFACTURA, new { htmlAttributes = new { @class = "form-control NumFactura" } })
+                                @Html.ValidationMessageFor(model => model.NUMFACTURA, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IVA, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.IVA, new { htmlAttributes = new { @class = "form-control IVAFactura" } })
+                                @Html.ValidationMessageFor(model => model.IVA, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div style="width:100%;"class="text-center">
+                            <table id="tb_Detalle" class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>IIDDETALLE</th>
+                                        <th>#</th>
+                                        <th>NOMBREPRODUCTO</th>
+                                        <th>CANTIDAD</th>
+                                        <th>PRECIO</th>
+                                        <th>TOTAL</th>
+                                        <th>*</th>
+                                        <th>*</th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <button id="nuevaFactura" class="btn btn-success btn-lg btn-block hidden">Creat Nueva Factura</button>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <button id="generarFactira" class="btn btn-success btn-lg btn-block">Crear Factura</button>
+                                    <button id="actaulizarFactura" type="button" class="btn btn-warning btn-lg btn-block hidden ">Actualizar Factura</button>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-6">
+            <div class="panel panel-success">
+                <div class="panel-heading">LISTADO DE FACTURAS</div>
+                <div class="panel-body">
+                    <div style="width:100%; " class="text-center">
+                        <table id="tb_Factura" class="table  table-bordered nowrap" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>IIDFACTURA</th>
+                                    <th>IIDPersona</th>
+                                    <th>Nombre</th>
+                                    <th>Cuidad</th>
+                                    <th>Telefono</th>
+                                    <th>NumFactura</th>
+                                    <th>IVA</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+<input type="hidden" id="IDFactura" value="0">
+
+@section scripts {
+    <script>
+        var base_url = window.location.origin;
+        var addICon = base_url + '/fonts/add.png';
+        var deleteIcon = base_url + '/fonts/delete.png';
+        var dataSet = [{
+            "IIDDETALLE": 0,
+            "IIDFACTURA": 0,
+            "NOMBREPRODUCTO": "<select class='Productos_cb form-control inputTb__detalle' style='width:100%'><option value='0' data-precio='0'>Seleccionar</option><option value='1' data-precio='12.50'>ARCABOSE</option><option value='2' data-precio='13.43'>ACETOHIDRO acid</option><option value='3' data-precio='16.34'>TUDORZA PRESSAIR</option><option value='4' data-precio='13.54'>PROVENTIL-HFA, VENTOLIN-HFA</option></select>",
+            "CANTIDAD": '<input id="cantidad_text" type="text" name="cantidad" class="form-control text-box single-line inputTb__detalle"   disabled value="">',
+            "PRECIO_UNITARIO": 0,
+            "TOTAL": 0,
+            "ESTADO" :1,
+            "NUMERO_REGISTRO": 1,
+            "ACCION": '<input id="tb_Detalle_btnAgregarProducto" type="image" src="' + addICon + '" height="25" width="25">'
+        }];
+        var contadorDetalle = 0;
+        var $tb_Detalle = $("#tb_Detalle").DataTable({
+            "paging": false,
+            "ordering": false,
+            "dom": '<"top"i>rt<"bottom"><"clear" >',
+            responsive: true,
+            data: dataSet,
+            "rowCallback": function (row, data) {
+                if (contadorDetalle != 0 ) {
+                    $('td:eq(5)', row).html('<input id="tb_Detalle_btnElminarProducto" type="image" src="' + deleteIcon + '" height="25" width="25">');
+                    $(row).addClass('insertRows');
+                }
+                $('td:eq(0)', row).html(contadorDetalle);
+                contadorDetalle++;
+            },
+            "columns": [
+                { "data": "IIDDETALLE",         "class": "columnIIDDETALLE",        "name": "IIDFACTURA", "autoWidth": true },
+                { "data": "NUMERO_REGISTRO",    "class": "columnNumero",            "name": "IIDPersona", "autoWidth": true },
+                { "data": "NOMBREPRODUCTO",     "class": "columnNOMBREPRODUCTO",    "name": "Nombre", "autoWidth": true },
+                { "data": "CANTIDAD",           "class": "columnCANTIDAD",          "name": "Cuidad", "autoWidth": true },
+                { "data": "PRECIO_UNITARIO",    "class": "columnPRECIO", "name": "Telefono", "autoWidth": true },
+                { "data": "TOTAL",              "class": "columnTOTAL", "name": "NumFactura", "autoWidth": true },
+                { "data": "ACCION",             "class": "columnEjecutar",          "name": "IVA", "autoWidth": true },
+                { "data": "ESTADO",             "class": "columndEstado",               "name": "IVA", "autoWidth": true }
+            ],
+            "rowGroup": {
+                dataSrc: 7,
+                startRender: null,
+                endRender: function (rows, group) {
+                    var salaryAvg = rows.data().pluck(('TOTAL')) // get data from the total colomn defined in section coloumn
+                        .reduce(function (a, b) {
+                            return (parseFloat(a) + parseFloat(b));
+                        });
+                    salaryAvg = $.fn.dataTable.render.number(',', '.', 2, '$').display(salaryAvg);
+                    return $('<tr/>')
+                            .append('<td></td>')
+                            .append('<td></td>')
+                            .append('<td></td>')
+                            .append('<td>Total</td>')
+                            .append('<td>' + salaryAvg + '</td>')
+                            .append('<td></td>')
+                            .append('<td></td>');
+                }
+            },
+            "columnDefs": [{
+                    "targets": [0],
+                    "visible": false,
+                    "searchable": false,
+                    "className": "text-center"},
+                  { "targets": [7],
+                    "visible": false,
+                    "className": "text-center"}],
+            // "select": true
+        });
+        $tb_Detalle.on('keydown',   '#cantidad_text', function (e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A
+           (e.keyCode == 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+           (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            var charValue = String.fromCharCode(e.keyCode)
+                , valid = /^[0-9]+$/.test(charValue);
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+        $tb_Detalle.on('keyup',     '#cantidad_text', function () {
+            //Get the cell of the input
+            var cell = $(this).closest('td.first');
+            //update the input value
+            $(this).attr('value', $(this).val());
+            var precio = $('.Productos_cb option:selected').attr('data-precio');
+
+            var total = parseFloat($(this).val()) * parseFloat(precio);
+            $tb_Detalle.cell({ row: 0, column: 4 }).data(parseFloat(precio).toFixed(2));
+            $tb_Detalle.cell({ row: 0, column: 5 }).data(total.toFixed(2));
+            contadorDetalle = 0;
+            $tb_Detalle.draw();
+
+            $(this).focus();
+        });
+        $tb_Detalle.on('change',    'select.Productos_cb', function () {
+
+            var $this = $(this);
+            var precio = $('.Productos_cb option:selected').attr('data-precio');
+            $tb_Detalle.cell({ row: 0, column: 4 }).data(precio);
+            $tb_Detalle.cell({ row: 0, column: 5 }).data('0');
+
+            $this.closest('tr').find('#cantidad_text').val('').removeAttr('disabled').focus();
+            contadorDetalle = 0;
+            $tb_Detalle.draw();
+        });
+        $tb_Detalle.on('click',     '#tb_Detalle_btnAgregarProducto', function (e) {
+            e.preventDefault();
+            var $row = $(this).closest('tr');
+            $('#cantidad_text').attr('disabled');
+            var tb_index = $tb_Detalle.row($row).index();
+            var $DataIngresada = $tb_Detalle.row(tb_index).data();
+            var obj = new Object();
+            if ($('.Productos_cb option:selected').text() == 'Seleccionar') {
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Seleccionar producto');
+                $('.Productos_cb option:selected').focus;
+                return
+            }
+            if ($("#cantidad_text").val()=='') {
+                $("#cantidad_text").focus;
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Ingrese cantidad del  producto');
+                return
+            }
+
+            obj.IIDDETALLE = $DataIngresada['IIDDETALLE'];
+            obj.IIDFACTURA = 0;
+            obj.NOMBREPRODUCTO = $('.Productos_cb option:selected').text();
+            obj.CANTIDAD = parseFloat($("#cantidad_text").val());
+            obj.PRECIO_UNITARIO = parseFloat($DataIngresada['PRECIO_UNITARIO']);
+            obj.TOTAL = parseFloat($DataIngresada['TOTAL']);
+            obj.ESTADO = 1;
+            obj.NUMERO_REGISTRO = 0;
+            obj.ACCION = '';
+            var row = $tb_Detalle.row.add(obj);
+            $tb_Detalle.row(row).nodes().to$().addClass('insertRows');
+            $tb_Detalle.cell({ row: 0, column: 4 }).data('0');
+            $tb_Detalle.cell({ row: 0, column: 5 }).data('0');
+            $(".Productos_cb").val($(".Productos_cb option:first").val());
+            $("#cantidad_text").val("");
+            contadorDetalle = 0;
+            $tb_Detalle.draw();
+        });
+        $tb_Detalle.on('click',     '#tb_Detalle_btnElminarProducto', function (e) {
+            e.preventDefault();
+            var $row = $(this).closest('tr');
+            var tb_index = $tb_Detalle.row($row).index();
+            var tb_Colindex = $tb_Detalle.column('.columndEstado').index();
+
+            $tb_Detalle.cell({ row: tb_index, column: tb_Colindex }).data(0);
+            contadorDetalle = 0;
+            $tb_Detalle.column('.columndEstado').search(1).draw();
+         
+            //$tb_Detalle.row($row).remove().draw();
+        });
+        $("#generarFactira").click(function (e) {
+            e.preventDefault();
+            var IIDPERSONA = $(".Cliente_cb").chosen().val();
+            var FECHA = $(".FechaFactura").val();
+            var NUMFACTURA = $(".NumFactura").val();
+            var IVA = $(".IVAFactura").val();
+            if (IIDPERSONA == '') {
+                //alertify.alert('Error', 'Selecccionar cliente', function () { alertify.error('Seleccionar cliente'); });
+                $(".Cliente_cb").focus();
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Seleccionar cliente');
+                return
+            }
+
+            if (FECHA == '') {
+                $(".FechaFactura").focus();
+                //alertify.alert('Error', 'Selecccionar una fecha de factura', function () { alertify.error('Seleccionar una fecha de factura'); });
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Seleccionar una fecha de factura');
+                return
+            }
+
+            if (NUMFACTURA == '') {
+                //alertify.alert('Error', 'Ingrese numero de factura', function () { alertify.error('Validar el numero de factura'); });
+                $(".NumFactura").focus();
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Ingrese numero de factura');
+                return
+            }
+
+            if (IVA=='') {
+                //alertify.alert('Error', 'Ingrese IVA', function () { alertify.error('Validar iva'); });
+                $(".IVAFactura").focus();
+                alertify.error('Ingrese iva');
+                return
+            }
+         
+            if ($tb_Detalle.rows('.insertRows').data().toArray() < 1) {
+                //alertify.alert('Error', 'Ingrese productos a la factura', function () { alertify.error('Validar iva'); });
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Ingrese productos a la factura');
+                return
+            }
+
+            var IIDPERSONA = parseInt(IIDPERSONA);
+            var obj = new Object();
+            obj.IIDPERSONA = IIDPERSONA,
+            obj.FECHA = FECHA;
+            obj.NUMFACTURA = NUMFACTURA;
+            obj.IVA = IVA;
+            obj.DETALLE = $tb_Detalle.rows('.insertRows').data().toArray();
+            obj.ESTADO = 1;
+            var objFormat = JSON.stringify(obj);
+            var CrearFacturaURL = base_url + '/Factura/CrearFactura';
+            //Ajax Function to send a get request
+            $.ajax({
+                "url": CrearFacturaURL,
+                "type": "POST",
+                "datatype": "json",
+                "contentType": 'application/json; charset=utf-8',
+                "data": objFormat,
+                "success": function (response) {
+                    //if request if made successfully then the response represent the data
+                    //alertify.set('notifier', 'position', 'top-right');
+              
+                    $(".Cliente_cb").val(0);
+                    $(".Cliente_cb").trigger("chosen:updated");
+                    $(".FechaFactura").val("");
+                    $(".NumFactura").val("");
+                    $(".IVAFactura").val("");
+                    $("#IDFactura").val("");
+                    $tb_Detalle.clear();
+                    contadorDetalle = 0;
+                    $tb_Detalle.rows.add(dataSet).draw();
+                    alertify.set('notifier', 'position', 'top-left');
+                    alertify.success('Factura creada con exito!');
+                    $tb_Factura.draw();
+                }
+            });
+        });
+        //server side processing for Factura
+        $tb_FacturaURL = base_url + "/Factura/DatatTableListFacturas";
+        var $tb_Factura = $("#tb_Factura").DataTable({
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            responsive: true,
+            "orderMulti": false, // for disable multiple column at once
+            "ajax": {
+                "url": $tb_FacturaURL,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columnDefs":
+            [{
+                "targets": [0],
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "targets": [1],
+                "visible": false,
+                "searchable": false
+            }],
+            "columns": [
+                { "data": "IIDFACTURA", "name": "IIDFACTURA", "autoWidth": true },
+                { "data": "IIDPERSONA", "name": "IIDPersona", "autoWidth": true },
+                { "data": "NOMBRE", "name": "Nombre", "autoWidth": true },
+                { "data": "CUIDAD", "name": "Cuidad", "autoWidth": true },
+                { "data": "TELEFONO", "name": "Telefono", "autoWidth": true },
+                { "data": "NUMFACTURA", "name": "NumFactura", "autoWidth": true },
+                { "data": "IVA",        "name": "IVA", "autoWidth": true },
+
+                {
+                    "render": function (data, type, full, meta)
+                    { return '<a class="btn btn-info tb_Factura_editar" data-IIDFACTURA=' + full.IIDFACTURA + ' data-IIDPersona=' + full.IIDPERSONA + '  href="#">Edit</a>'; }
+                },
+                {
+                    data: null, render: function (data, type, row) {
+                        return "<a href='#' class='btn btn-danger  tb_Factura_eliminar' data-IIDFACTURA=" + row.IIDFACTURA + "  ; >Delete</a>";
+                    }
+                },
+            ]
+
+        });
+        //Editar Factura
+        $tb_Factura.on('click',     '.tb_Factura_editar', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            $("#actaulizarFactura").removeClass('hidden');
+            $("#generarFactira").addClass('hidden');
+            $("#nuevaFactura").removeClass('hidden');
+            $tb_Factura.rows('.selected').deselect();
+            $this.closest('tr').addClass('selected');
+            var IIDFACTURA =$this.attr('data-IIDFACTURA');
+            var IIDPersona = $this.attr('data-IIDPersona');
+            var $tb_FacturaEditURL = base_url + "/Factura/DatatTableListDetalle?IIDFACTURA=" + IIDFACTURA + "&IIDPersona=" + IIDPersona;
+            $tb_Detalle.clear();
+            contadorDetalle = 0;
+            $tb_Detalle.rows.add(dataSet);
+         
+            $.ajax({
+                "url": $tb_FacturaEditURL,
+                "type": "POST",
+                "datatype": "json",
+                "success": function (response) {
+                    console.log(response);
+                    $(".Cliente_cb").val(response.IIDPersona);
+                    $(".Cliente_cb").trigger("chosen:updated");
+                    $(".FechaFactura").val(response.FECHA);
+                    $(".NumFactura").val(response.NUMFACTURA);
+                    $(".IVAFactura").val(response.IVA);
+                    $("#IDFactura").val(response.IIDFACTURA);
+                    $tb_Detalle.rows.add(response.data);
+                    $tb_Detalle.columns('.columndEstado').search(1).draw();
+                }
+            });
+        });
+        //Eliminar Factura
+        $tb_Factura.on('click',     '.tb_Factura_eliminar', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var $row = $this.closest('tr');
+            var IIDFACTURA = $this.attr('data-IIDFACTURA');
+            var $tb_Factura_EliminarURl = base_url + "/Factura/EliminarFactura?IIFACTURA_PA=" + IIDFACTURA;
+            //$tb_Detalle.clear();
+            //$tb_Detalle.rows.add(dataSet);
+            contadorDetalle = 0;
+            $.ajax({
+                "url": $tb_Factura_EliminarURl,
+                "type": "POST",
+                "datatype": "json",
+                "success": function (response) {
+                    console.log(response);
+                    $tb_Factura.draw();
+                }
+            });
+            //$tb_Factura.row($row).remove().draw();
+        });
+        $(".Cliente_cb").chosen({ no_results_text: "Oops, nothing found!" });
+        //$(".Productos_cb").chosen({ no_results_text: "Oops, nothing found!" });
+        $('.chosen-drop ').css({ "width": "900px" });
+        $("#actaulizarFactura").on('click', function (e) {
+            e.preventDefault();
+            var IIDPERSONA = $(".Cliente_cb").chosen().val();
+            var FECHA = $(".FechaFactura").val();
+            var NUMFACTURA = $(".NumFactura").val();
+            var IVA = $(".IVAFactura").val();
+            var IDFactura= $("#IDFactura").val();
+
+            if (IIDPERSONA == '') {
+                //alertify.alert('Error', 'Selecccionar cliente', function () { alertify.error('Seleccionar cliente'); });
+                $(".Cliente_cb").focus();
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Seleccionar cliente');
+                return
+            }
+
+            if (FECHA == '') {
+                $(".FechaFactura").focus();
+                //alertify.alert('Error', 'Selecccionar una fecha de factura', function () { alertify.error('Seleccionar una fecha de factura'); });
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Seleccionar una fecha de factura');
+                return
+            }
+
+            if (NUMFACTURA == '') {
+                //alertify.alert('Error', 'Ingrese numero de factura', function () { alertify.error('Validar el numero de factura'); });
+                $(".NumFactura").focus();
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Ingrese numero de factura');
+                return
+            }
+
+            if (IVA == '') {
+                //alertify.alert('Error', 'Ingrese IVA', function () { alertify.error('Validar iva'); });
+                $(".IVAFactura").focus();
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Ingrese iva');
+                return
+            }
+
+            if ($tb_Detalle.rows('.insertRows').data().toArray() < 1) {
+                //alertify.alert('Error', 'Ingrese productos a la factura', function () { alertify.error('Validar iva'); });
+                alertify.set('notifier', 'position', 'top-left');
+                alertify.error('Ingrese productos a la factura');
+                return
+            }
+
+            var IIDPERSONA = parseInt(IIDPERSONA);
+            var obj = new Object();
+            obj.IIDPERSONA = 1,
+            obj.FECHA = FECHA;
+            obj.NUMFACTURA = NUMFACTURA;
+            obj.IVA = IVA;
+            obj.DETALLE = $tb_Detalle.rows('.insertRows').data().toArray();
+            obj.ESTADO = 1;
+            obj.IIDFACTURA = parseInt(IDFactura);
+            
+            var objFormat = JSON.stringify(obj);
+            console.log(objFormat);
+            var CrearFacturaURL = base_url + '/Factura/EditarFactura';
+            //Ajax Function to send a get request
+            $.ajax({
+                "url": CrearFacturaURL,
+                "type": "POST",
+                "datatype": "json",
+                "contentType": 'application/json; charset=utf-8',
+                "data": objFormat,
+                "success": function (response) {
+                    //if request if made successfully then the response represent the data
+                    //alertify.set('notifier', 'position', 'top-right');
+                    $(".Cliente_cb").val(0);
+                    $(".Cliente_cb").trigger("chosen:updated");
+                    $(".FechaFactura").val("");
+                    $(".NumFactura").val("");
+                    $(".IVAFactura").val("");
+                    $("#IDFactura").val("");
+                    $tb_Detalle.clear();
+                    $tb_Detalle.rows.add(dataSet).draw();
+
+                    $("#generarFactira").removeClass('hidden');
+                    $("#actaulizarFactura").addClass('hidden');
+                    $("#nuevaFactura").addClass('hidden');
+                    alertify.set('notifier', 'position', 'top-left');
+                    alertify.success('Factura actualizada con exito!');
+                    $tb_Factura.draw();
+                }
+            });
+
+        });
+    </script>
+}
+

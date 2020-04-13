@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="DBPruebaModelStoreContainer" CdmEntityContainer="DBPruebaEntities">
+    <EntitySetMapping Name="CUIDADs">
+      <EntityTypeMapping TypeName="DBPruebaModel.CUIDAD">
+        <MappingFragment StoreEntitySet="CUIDAD">
+          <ScalarProperty Name="IIDCUIDAD" ColumnName="IIDCUIDAD" />
+          <ScalarProperty Name="NOMBRE" ColumnName="NOMBRE" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DETALLEs">
+      <EntityTypeMapping TypeName="DBPruebaModel.DETALLE">
+        <MappingFragment StoreEntitySet="DETALLE">
+          <ScalarProperty Name="IIDDETALLE" ColumnName="IIDDETALLE" />
+          <ScalarProperty Name="IIDFACTURA" ColumnName="IIDFACTURA" />
+          <ScalarProperty Name="NOMBREPRODUCTO" ColumnName="NOMBREPRODUCTO" />
+          <ScalarProperty Name="CANTIDAD" ColumnName="CANTIDAD" />
+          <ScalarProperty Name="PRECIO_UNITARIO" ColumnName="PRECIO_UNITARIO" />
+          <ScalarProperty Name="TOTAL" ColumnName="TOTAL" />
+          <ScalarProperty Name="ESTADO" ColumnName="ESTADO" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="FACTURAs">
+      <EntityTypeMapping TypeName="DBPruebaModel.FACTURA">
+        <MappingFragment StoreEntitySet="FACTURA">
+          <ScalarProperty Name="IIDFACTURA" ColumnName="IIDFACTURA" />
+          <ScalarProperty Name="IIDPERSONA" ColumnName="IIDPERSONA" />
+          <ScalarProperty Name="NUMFACTURA" ColumnName="NUMFACTURA" />
+          <ScalarProperty Name="CEDULA" ColumnName="CEDULA" />
+          <ScalarProperty Name="FECHA" ColumnName="FECHA" />
+          <ScalarProperty Name="IVA" ColumnName="IVA" />
+          <ScalarProperty Name="ESTADO" ColumnName="ESTADO" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Personas">
+      <EntityTypeMapping TypeName="DBPruebaModel.Persona">
+        <MappingFragment StoreEntitySet="Persona">
+          <ScalarProperty Name="IIDPersona" ColumnName="IIDPersona" />
+          <ScalarProperty Name="IIDCUIDAD" ColumnName="IIDCUIDAD" />
+          <ScalarProperty Name="CEDULA" ColumnName="CEDULA" />
+          <ScalarProperty Name="NOMBRE" ColumnName="NOMBRE" />
+          <ScalarProperty Name="APELLIDO" ColumnName="APELLIDO" />
+          <ScalarProperty Name="TELEFONO" ColumnName="TELEFONO" />
+          <ScalarProperty Name="ESTADO" ColumnName="ESTADO" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
